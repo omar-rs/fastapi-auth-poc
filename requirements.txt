@@ -1,0 +1,8 @@
+bcrypt
+fastapi
+httpx
+passlib
+python-dotenv
+python-jose
+python-multipart
+uvicorn
