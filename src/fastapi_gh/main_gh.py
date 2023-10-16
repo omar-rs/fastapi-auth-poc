@@ -1,24 +1,21 @@
 import logging
 import os
+from dotenv import load_dotenv
 
 import httpx
 import uvicorn
 from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 
-# publish_scope = 'posit:publish'
-#
-# auth = Auth0(domain=auth0_domain, api_audience=auth0_api_audience, scopes={
-#     publish_scope: 'publish a content'
-# })
-
 logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 
 logger = logging.getLogger(__name__)
 app = FastAPI()
 
-github_client_id = 'fc2e157d914ae7f2df9b'
-github_client_secret = 'e774b9f8d6f736ab7291b5ee0c55398f938dc572'
+load_dotenv()
+
+github_client_id = os.getenv('GH_CLIENT_ID')
+github_client_secret = os.getenv('GH_CLIENT_SECRET')
 
 
 @app.get('/github-login')

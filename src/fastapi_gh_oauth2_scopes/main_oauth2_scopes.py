@@ -1,6 +1,7 @@
 import httpx
 import logging
 import os
+from dotenv import load_dotenv
 import pprint
 from datetime import datetime, timedelta
 from typing import Annotated, Optional, Dict
@@ -18,14 +19,16 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, ValidationError
 
+load_dotenv()
+
 # to get a string like this run:
 # openssl rand -hex 32
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-github_client_id = 'fc2e157d914ae7f2df9b'
-github_client_secret = 'e774b9f8d6f736ab7291b5ee0c55398f938dc572'
+github_client_id = os.getenv('GH_CLIENT_ID')
+github_client_secret = os.getenv('GH_CLIENT_SECRET')
 
 logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
@@ -133,7 +136,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
@@ -150,7 +153,7 @@ async def get_current_user(
         headers={"WWW-Authenticate": authenticate_value},
     )
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
